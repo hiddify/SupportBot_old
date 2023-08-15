@@ -1,0 +1,2 @@
+pyTelegramBotAPI
+load_dotenv
