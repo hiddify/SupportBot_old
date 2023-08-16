@@ -1,0 +1,9 @@
+version: '3'
+
+services:
+  supportbot:
+    build: .
+    volumes:
+      - ./bot:/root/hiddifysupport
+    environment:
+      BOT_TOKEN: token
