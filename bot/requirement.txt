@@ -1,2 +1,6 @@
 pyTelegramBotAPI
 load_dotenv
+asyncio
+aiohttp
+pep505
+asyncssh
