@@ -103,7 +103,7 @@ def get_ssh_info(txt):
 
 
 async def test_ssh_connection(ssh_info):
-
+    return True
     if not ssh_info:
         return False
     print("TEST")
@@ -246,7 +246,7 @@ async def send_sshinfo(message):
     # print(user_id,chat_id,'ddddddddd')
     async with bot.retrieve_data(user_id, chat_id) as data:
         # print('fffff',data)
-        await bot.copy_message(message.chat.id, data['SSH_info_comment'].chat.id, data['SSH_info_comment'].message_id, reply_to_message_id=message.message_id)
+        # await bot.copy_message(message.chat.id, data['SSH_info_comment'].chat.id, data['SSH_info_comment'].message_id, reply_to_message_id=message.message_id)
         if 'support_message' in data:
             await bot.copy_message(message.chat.id, data['support_message'].chat.id, data['support_message'].message_id, reply_to_message_id=message.message_id)
             # await bot.reply_to(message,data['support_message'])
@@ -273,10 +273,10 @@ async def reply_to_user(current_message: Message):
         # await bot.copy_message(chat_id, current_message.chat.id,  current_message.message_id)
         if current_message.text:
             await bot.send_message(chat_id, f"""
+`{current_message.message_id}`
 شما میتوانید با ریپلای به این پیام، جواب دهید.
 You can reply by replying to this message            
 
-`{current_message.message_id}`
 {current_message.text}
             """)
         else:
@@ -309,13 +309,13 @@ async def reply_to_us(current_message: Message):
     if current_message.text:
         await bot.send_message(-1001884387011, f"""
 `{current_message.from_user.id}` `{current_message.chat.id}` 
-[{message.from_user.first_name or ""} {message.from_user.last_name or ""}](tg://user?id={message.from_user.id})            
+[{current_message.from_user.first_name or ""} {current_message.from_user.last_name or ""}](tg://user?id={message.from_user.id})            
 {current_message.text}
         """, reply_to_message_id=message_id)
     else:
         await bot.copy_message(-1001884387011, current_message.chat.id,  current_message.message_id, caption=f"""
 `{current_message.from_user.id}` `{current_message.chat.id}`
-[{message.from_user.first_name or ""} {message.from_user.last_name or ""}](tg://user?id={message.from_user.id})
+[{current_message.from_user.first_name or ""} {current_message.from_user.last_name or ""}](tg://user?id={current_message.from_user.id})
 {current_message.caption}
         """, reply_to_message_id=message_id)
 
