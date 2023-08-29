@@ -273,15 +273,21 @@ async def reply_to_user(current_message: Message):
         # await bot.copy_message(chat_id, current_message.chat.id,  current_message.message_id)
         if current_message.text:
             await bot.send_message(chat_id, f"""
+شما میتوانید با ریپلای به این پیام، جواب دهید.
+You can reply by replying to this message            
+
 `{current_message.message_id}`
 {current_message.text}
             """)
         else:
             await bot.copy_message(chat_id, current_message.chat.id,  current_message.message_id, caption=f"""
 `{current_message.message_id}` 
+شما میتوانید با ریپلای به این پیام، جواب دهید.
+You can reply by replying to this message
+
 {current_message.caption}
             """)
-
+        await bot.reply_to(current_message, "پاسخ شما به کاربر ارسال شد.")
     except Exception as e:
         print(e)
 
@@ -296,22 +302,22 @@ async def reply_to_us(current_message: Message):
     try:
         meta = message.text.split("\n")[0].split(" ")
         message_id = int(meta[0])
+    except Exception as e:
+        print(e)
+
         # await bot.copy_message(chat_id, current_message.chat.id,  current_message.message_id)
-        if current_message.text:
-            await bot.send_message(-1001884387011, f"""
+    if current_message.text:
+        await bot.send_message(-1001884387011, f"""
 `{current_message.from_user.id}` `{current_message.chat.id}` 
 [{message.from_user.first_name or ""} {message.from_user.last_name or ""}](tg://user?id={message.from_user.id})            
 {current_message.text}
-            """, reply_to_message_id=message_id)
-        else:
-            await bot.copy_message(-1001884387011, current_message.chat.id,  current_message.message_id, caption=f"""
+        """, reply_to_message_id=message_id)
+    else:
+        await bot.copy_message(-1001884387011, current_message.chat.id,  current_message.message_id, caption=f"""
 `{current_message.from_user.id}` `{current_message.chat.id}`
 [{message.from_user.first_name or ""} {message.from_user.last_name or ""}](tg://user?id={message.from_user.id})
 {current_message.caption}
-            """, reply_to_message_id=message_id)
-
-    except Exception as e:
-        print(e)
+        """, reply_to_message_id=message_id)
 
 
 @bot.message_handler(func=lambda msg: msg and msg.chat and msg.from_user and msg.from_user.id == msg.chat.id)
