@@ -103,7 +103,7 @@ def get_ssh_info(txt):
 
 
 async def test_ssh_connection(ssh_info):
-    return True
+
     if not ssh_info:
         return False
     print("TEST")
