@@ -1,3 +1,7 @@
+import asyncio
+import logging
+from telebot.async_telebot import AsyncTeleBot
+from dotenv import load_dotenv
 import os
 import asyncssh
 
@@ -7,46 +11,44 @@ from telebot import asyncio_filters
 
 from telebot.asyncio_handler_backends import State, StatesGroup
 
-from telebot.types import ReplyKeyboardMarkup, KeyboardButton,ForceReply,ReplyKeyboardRemove
+from telebot.types import ReplyKeyboardMarkup, KeyboardButton, ForceReply, ReplyKeyboardRemove
 
 # States storage
 from telebot.asyncio_storage import StateMemoryStorage
 
-state_storage = StateMemoryStorage() # you can init here another storage
-from dotenv import load_dotenv
+state_storage = StateMemoryStorage()  # you can init here another storage
 # private_key = paramiko.RSAKey(filename="./bot/hiddify_support.key")
-private_key_path="./bot/hiddify_support.key"
-with open("./bot/hiddify_support.key.pub", 'r') as file:
+private_key_path = "./hiddify_support.key"
+with open("./hiddify_support.key.pub", 'r') as file:
     public_key = file.read()
 
 load_dotenv()
-BOT_TOKEN = os.environ.get('BOT_TOKEN') 
+BOT_TOKEN = os.environ.get('BOT_TOKEN')
 
-from telebot.async_telebot import AsyncTeleBot
-
-
-import logging
 
 logger = telebot.logger
-telebot.logger.setLevel(logging.INFO) # Outputs debug messages to console.
+telebot.logger.setLevel(logging.INFO)  # Outputs debug messages to console.
+
 
 class ExceptionHandler(telebot.ExceptionHandler):
     def handle(self, exception):
         # raise
         logger.error(exception)
 
-bot = AsyncTeleBot(BOT_TOKEN,state_storage=state_storage,parse_mode="markdown",exception_handler=ExceptionHandler())
+
+bot = AsyncTeleBot(BOT_TOKEN, state_storage=state_storage, parse_mode="markdown", exception_handler=ExceptionHandler())
 
 # States group.
+
+
 class MyStates(StatesGroup):
     # Just name variables differently
-    SSH_info = State() # creating instances of State class is enough from now
-    SSH_info_comment=State()
-    SSH_info_from_support=State()
+    SSH_info = State()  # creating instances of State class is enough from now
+    SSH_info_comment = State()
+    SSH_info_from_support = State()
     Feedback = State()
     Support = State()
-    INIT=State()
-
+    INIT = State()
 
 
 # Any state
@@ -60,10 +62,7 @@ async def any_state(message):
     await send_welcome(message)
 
 
-
-
-
-@bot.message_handler(func=lambda msg: msg.text=="Critical Bug")
+@bot.message_handler(func=lambda msg: msg.text == "Critical Bug")
 async def ssh(message):
     markup = ForceReply(selective=False)
     await bot.send_message(message.chat.id, """
@@ -76,12 +75,12 @@ Ok! Please run the following command and send your ssh information.
                      
 `echo '{public_key}'>>~/.ssh/authorized_keys`                                                         
                      """
-                     )
-    
-    await bot.send_message(message.chat.id,"""\
+                           )
+
+    await bot.send_message(message.chat.id, """\
 Then send the ssh information. e.g.,
 `ssh root@ip -p 22`      
-                     """,reply_markup=markup)
+                     """, reply_markup=markup)
     await bot.set_state(message.from_user.id, MyStates.SSH_info, message.chat.id)
     # print('state',MyStates.SSH_info)
     # async with bot.retrieve_data(message.from_user.id, message.chat.id) as data:
@@ -96,51 +95,58 @@ def get_ssh_info(txt):
     if match:
         groups = match.groupdict()
         try:
-            port=int(groups.get('port', '22'))
+            port = int(groups.get('port', '22'))
         except:
-            port= 22
-        return {'user':groups['user'],'host':groups['host'],'port':port}
+            port = 22
+        return {'user': groups['user'], 'host': groups['host'], 'port': port}
     return None
 
+
 async def test_ssh_connection(ssh_info):
-    if not ssh_info:return False
-    # private_key_path=pr
+    if not ssh_info:
+        return False
+    print("TEST")
     try:
-        async with asyncssh.connect(ssh_info['host'], port=ssh_info['port'], username=ssh_info['user'], client_keys=[private_key_path],known_hosts=None) as conn:
+        async with asyncssh.connect(ssh_info['host'], port=ssh_info['port'], username=ssh_info['user'], client_keys=[private_key_path], known_hosts=None, connect_timeout=1) as conn:
             result = await conn.run('ls -l')
             print(result.stdout)
+        print("SUCCESS")
         return True
     except Exception as e:
         print(f"Error: {e}")
     return False
 
+
 @bot.message_handler(state=MyStates.SSH_info)
 async def ssh_received(message):
-    ssh_info=get_ssh_info(message.text)
+    ssh_info = get_ssh_info(message.text)
     if not await test_ssh_connection(ssh_info):
-        await bot.send_message(message.chat.id,"""We can not connect to your server. """)    
-        
+        print("""We can not connect to your server. """)
+        await bot.send_message(message.chat.id, """We can not connect to your server.
+ما نمی توانیم به سرور شما متصل شویم
+         """)
+
         return await ssh(message)
 
+    await bot.send_message(message.chat.id, """\
+متشکرم. ما اطلاعات ssh شما را دریافت کرده ایم. لطفا توضیح مشکل خود را در یک پیام ارسال کنید.
 
-    await bot.send_message(message.chat.id,"""\
 Thank you. We have received your ssh info. Please send a description of your problem in one message.
                      """)
     await bot.set_state(message.from_user.id, MyStates.SSH_info_comment, message.chat.id)
     # new_message=bot.forward_message(-1001834220158,from_chat_id=message.chat.id,message_id=message.message_id)
     # print("new message",new_message)
-    
+
     async with bot.retrieve_data(message.from_user.id, message.chat.id) as data:
-        data['SSH_info']=ssh_info
+        data['SSH_info'] = ssh_info
     #     bot.reply_to(new_message,data['SSH_info'])
-    
-    
+
 
 @bot.message_handler(state=MyStates.SSH_info_comment)
 async def ssh_received_comment(message):
-    async with bot.retrieve_data(message.from_user.id, message.chat.id) as data:       
-        ssh_info=data['SSH_info']
-        msgtxt=f'''
+    async with bot.retrieve_data(message.from_user.id, message.chat.id) as data:
+        ssh_info = data['SSH_info']
+        msgtxt = f'''
     `{message.from_user.id}` `{message.chat.id} Donated={'support_message' in data}`
     [{message.from_user.first_name or ""} {message.from_user.last_name or ""}](tg://user?id={message.from_user.id}) [user:](@{message.from_user.username})  in {message.chat.title}
     `ssh {ssh_info['user']}@{ssh_info['host']} -p {ssh_info['port']}`
@@ -148,76 +154,50 @@ async def ssh_received_comment(message):
     {message.text}
     '''
         # print(msgtxt)
-        new_message=await bot.send_message(-1001834220158,msgtxt,parse_mode='markdown')
-    
+        new_message = await bot.send_message(-1001834220158, msgtxt, parse_mode='markdown')
+
     # async with bot.retrieve_data(message.from_user.id, message.chat.id) as data:
-        data['SSH_info_comment']=message
-    # new_message=await bot.forward_message(-1001834220158,from_chat_id=message.chat.id,message_id=message.message_id)    
-    await bot.send_message(message.chat.id,"Thank you for your message. از پیام شما متشکریم به زودی پیام شما را بررسی میکنیم")
+        data['SSH_info_comment'] = message
+    # new_message=await bot.forward_message(-1001834220158,from_chat_id=message.chat.id,message_id=message.message_id)
+    await bot.send_message(message.chat.id, "Thank you for your message. از پیام شما متشکریم به زودی پیام شما را بررسی میکنیم")
 
     await send_welcome(message)
 
 
-
-
-
-
-
-
-
-
-    
-
-
-
-
-
-
-
-
-@bot.message_handler(func=lambda msg: msg.text=="Feedback")
+@bot.message_handler(func=lambda msg: msg.text == "Feedback")
 async def feedback(message):
-    await bot.send_message(message.chat.id,"""\
+    await bot.send_message(message.chat.id, """\
 Please enter your private feedback. لطفا فیدبک خود را اعلام نمایید
                      """)
     await bot.set_state(message.from_user.id, MyStates.Feedback, message.chat.id)
-        
+
 
 @bot.message_handler(state=MyStates.Feedback)
 async def feedback_received(message):
-    new_message=await bot.forward_message(-1001834220158,from_chat_id=message.chat.id,message_id=message.message_id)    
-    await bot.send_message(message.chat.id,"Thank you for your message. از پیام شما متشکریم به زودی پیام شما را بررسی میکنیم")
+    new_message = await bot.forward_message(-1001834220158, from_chat_id=message.chat.id, message_id=message.message_id)
+    await bot.send_message(message.chat.id, "Thank you for your message. از پیام شما متشکریم به زودی پیام شما را بررسی میکنیم")
     await send_welcome(message)
 
 
-
-
-
-
-
-
-
-
-@bot.message_handler(func=lambda msg: msg.text=="Support")
+@bot.message_handler(func=lambda msg: msg.text == "Support")
 async def support(message):
     markup = ForceReply(selective=False)
 
     await bot.send_message(message.chat.id, """\
 هیدیفای رایگان است  و همیشه رایگان خواهد ماند. اما چنانچه نیاز به ساپورت اختصاصی دارید با توجه به اینکه کارشناسان ما باید وقت و انرژیشون را به شما اختصاص بدهند لازمه به ازای هر ساعت مبلغ حداقل 10 دلار حمایت کنید.
                      """
-                     )
-    await bot.forward_message(message.chat.id,from_chat_id=-1001834220158,message_id=72)
-    await bot.send_message(message.chat.id,"""\
+                           )
+    await bot.forward_message(message.chat.id, from_chat_id=-1001834220158, message_id=72)
+    await bot.send_message(message.chat.id, """\
 لطفا اطلاعات حمایت پرداخت شده را ارسال نمایید
-                     """,reply_markup=markup)
+                     """, reply_markup=markup)
     await bot.set_state(message.from_user.id, MyStates.SSH_info_from_support, message.chat.id)
     # print('state',MyStates.SSH_info)
-    
 
 
 @bot.message_handler(state=MyStates.SSH_info_from_support)
 async def support_received_from_support(message):
-    await bot.send_message(message.chat.id,"""\
+    await bot.send_message(message.chat.id, """\
 Thank you for your support.
                      """)
     async with bot.retrieve_data(message.from_user.id, message.chat.id) as data:
@@ -225,70 +205,56 @@ Thank you for your support.
     await ssh(message)
     # new_message=bot.forward_message(-1001834220158,from_chat_id=message.chat.id,message_id=message.message_id)
     # print("new message",new_message)
-    
+
     # with bot.retrieve_data(message.from_user.id, message.chat.id) as data:
     #     bot.reply_to(new_message,data['SSH_info'])
-    
-    
+
 
 # @bot.message_handler(state=MyStates.SSH_info_comment)
 # async def ssh_received(message):
-#     new_message=await bot.forward_message(-1001834220158,from_chat_id=message.chat.id,message_id=message.message_id)    
+#     new_message=await bot.forward_message(-1001834220158,from_chat_id=message.chat.id,message_id=message.message_id)
 #     print("----------------------")
 #     print(new_message)
 #     async with bot.retrieve_data(message.from_user.id, message.chat.id) as data:
 #         await bot.send_message(-1001884387011,text=data['SSH_info'])
-#     await bot.send_message(-1001884387011,text='test',reply_to_message_id=new_message.message_id)        
+#     await bot.send_message(-1001884387011,text='test',reply_to_message_id=new_message.message_id)
 #     await bot.send_message(message.chat.id,"Thank you for your message. از پیام شما متشکریم به زودی پیام شما را بررسی میکنیم")
 #     await send_welcome(message)
 
 
-
-
-
-
-
-
-
-
-@bot.message_handler(func=lambda msg:msg and msg.sender_chat and msg.from_user and msg.from_user.id==777000 and msg.sender_chat.id==-1001834220158)
+@bot.message_handler(func=lambda msg: msg and msg.sender_chat and msg.from_user and msg.from_user.id == 777000 and msg.sender_chat.id == -1001834220158)
 async def send_sshinfo(message):
     # print("DDDDDDDDDDDDD",message)
-    meta=message.text.split("\n")[0].split(" ") 
-    user_id=int(meta[0])
-    chat_id=int(meta[1])
+    meta = message.text.split("\n")[0].split(" ")
+    user_id = int(meta[0])
+    chat_id = int(meta[1])
     # print(user_id,chat_id,'ddddddddd')
-    async with bot.retrieve_data(user_id,chat_id) as data:
+    async with bot.retrieve_data(user_id, chat_id) as data:
         # print('fffff',data)
-        await bot.copy_message(message.chat.id,data['SSH_info_comment'].chat.id,data['SSH_info_comment'].message_id,reply_to_message_id=message.message_id)
+        await bot.copy_message(message.chat.id, data['SSH_info_comment'].chat.id, data['SSH_info_comment'].message_id, reply_to_message_id=message.message_id)
         if 'support_message' in data:
-            await bot.copy_message(message.chat.id,data['support_message'].chat.id,data['support_message'].message_id,reply_to_message_id=message.message_id)
+            await bot.copy_message(message.chat.id, data['support_message'].chat.id, data['support_message'].message_id, reply_to_message_id=message.message_id)
             # await bot.reply_to(message,data['support_message'])
-            # new_message=await bot.forward_message(message.chat.id,from_chat_id=data['support_message'].chat.id,message_id=data['support_message'].message_id)    
-
+            # new_message=await bot.forward_message(message.chat.id,from_chat_id=data['support_message'].chat.id,message_id=data['support_message'].message_id)
 
 
 @bot.message_handler()
 # @bot.message_handler(func=lambda msg:msg and msg.sender_chat and msg.sender_chat.id==msg.from_user.id)
 async def send_welcome(message):
     # await bot.send_message(message.chat.id,'d',reply_markup=ReplyKeyboardRemove())
-    # return 
-    print('state',MyStates.SSH_info,message)
-    print(message.from_user.id, message.chat.id,type(message.from_user.id), type(message.chat.id))
-    markup = ReplyKeyboardMarkup()
-    markup.add(KeyboardButton('Critical Bug'),KeyboardButton('Feedback'),'Support')
+    # return
+    print('state', MyStates.SSH_info, message)
+    print(message.from_user.id, message.chat.id, type(message.from_user.id), type(message.chat.id))
+    markup = ReplyKeyboardMarkup(True)
+    markup.add(KeyboardButton('Critical Bug'))  # , KeyboardButton('Feedback'), 'Support')
     await bot.reply_to(message, """\
 Welcome to Hiddify. Please select what do you want to send? 
 \n\n
 به هیدیفای خوش آمدید. لطفا مشخص کنید چه چیزی میخواهید ارسال کنید.
-"""
-                 ,reply_markup=markup)
-    await bot.set_state(message.from_user.id,MyStates.INIT, message.chat.id)
-    
+""", reply_markup=markup)
+    await bot.set_state(message.from_user.id, MyStates.INIT, message.chat.id)
+
 bot.add_custom_filter(asyncio_filters.StateFilter(bot))
 
 
-
-
-import asyncio
 asyncio.run(bot.polling())
