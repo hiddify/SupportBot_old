@@ -11,7 +11,7 @@ from telebot import asyncio_filters
 
 from telebot.asyncio_handler_backends import State, StatesGroup
 
-from telebot.types import ReplyKeyboardMarkup, KeyboardButton, ForceReply, ReplyKeyboardRemove
+from telebot.types import ReplyKeyboardMarkup, KeyboardButton, ForceReply, ReplyKeyboardRemove, Message
 
 # States storage
 from telebot.asyncio_storage import StateMemoryStorage
@@ -103,6 +103,7 @@ def get_ssh_info(txt):
 
 
 async def test_ssh_connection(ssh_info):
+    return True
     if not ssh_info:
         return False
     print("TEST")
@@ -147,7 +148,7 @@ async def ssh_received_comment(message):
     async with bot.retrieve_data(message.from_user.id, message.chat.id) as data:
         ssh_info = data['SSH_info']
         msgtxt = f'''
-    `{message.from_user.id}` `{message.chat.id} Donated={'support_message' in data}`
+    `{message.from_user.id}` `{message.chat.id}` `DN={'support_message' in data}`
     [{message.from_user.first_name or ""} {message.from_user.last_name or ""}](tg://user?id={message.from_user.id}) [user:](@{message.from_user.username})  in {message.chat.title}
     `ssh {ssh_info['user']}@{ssh_info['host']} -p {ssh_info['port']}`
 
@@ -159,8 +160,12 @@ async def ssh_received_comment(message):
     # async with bot.retrieve_data(message.from_user.id, message.chat.id) as data:
         data['SSH_info_comment'] = message
     # new_message=await bot.forward_message(-1001834220158,from_chat_id=message.chat.id,message_id=message.message_id)
-    await bot.send_message(message.chat.id, """Thank you for your message.
-     از پیام شما متشکریم به زودی پیام شما را بررسی میکنیم""")
+    await bot.send_message(message.chat.id, """
+    Thank you for your message.
+     از پیام شما متشکریم به زودی پیام شما را بررسی میکنیم   
+     """)
+
+    new_message = await bot.send_message(-1001834220158, msgtxt, parse_mode='markdown')
 
     await bot.send_message(message.chat.id, f"""
     در هر زمان که خواستید میتوانید با دستور زیر دسترسی ایجاد شده را قطع نمایید.
@@ -168,6 +173,7 @@ async def ssh_received_comment(message):
     At anytime, you can remove the access using the following code
     `sed -i '/{public_key}/d' ~/.ssh/authorized_keys`
     """)
+
     await send_welcome(message)
 
 
@@ -183,6 +189,7 @@ Please enter your private feedback. لطفا فیدبک خود را اعلام �
 async def feedback_received(message):
     new_message = await bot.forward_message(-1001834220158, from_chat_id=message.chat.id, message_id=message.message_id)
     await bot.send_message(message.chat.id, "Thank you for your message. از پیام شما متشکریم به زودی پیام شما را بررسی میکنیم")
+
     await send_welcome(message)
 
 
@@ -202,7 +209,8 @@ async def support(message):
     # print('state',MyStates.SSH_info)
 
 
-@bot.message_handler(state=MyStates.SSH_info_from_support)
+@bot.message_handler(state=MyStates.SSH_info_from_support, content_types=['audio', 'photo', 'voice', 'video', 'document',
+                                                                          'text', 'location', 'contact', 'sticker'])
 async def support_received_from_support(message):
     await bot.send_message(message.chat.id, """\
 Thank you for your support.
@@ -244,8 +252,69 @@ async def send_sshinfo(message):
             # await bot.reply_to(message,data['support_message'])
             # new_message=await bot.forward_message(message.chat.id,from_chat_id=data['support_message'].chat.id,message_id=data['support_message'].message_id)
 
+        await bot.send_message(chat_id, f"""{message.message_id}
+        {message.text}
 
-@bot.message_handler()
+You can send more message about this issue by replying to this message        
+     در هر زمان میتوانید با ریپلای کردن به این پیام، پیام های بیشتری در مورد این موضوع بنویسید        
+        """)
+
+
+@bot.message_handler(func=lambda msg: msg and msg.reply_to_message and msg.chat and msg.from_user and msg.from_user.id != msg.chat.id,
+                     content_types=['audio', 'photo', 'voice', 'video', 'document',
+                                    'text', 'location', 'contact', 'sticker'])
+async def reply_to_user(current_message: Message):
+    message = current_message.reply_to_message
+    # print("DDDDDDDDDDDDD",message)
+    try:
+        meta = message.text.split("\n")[0].split(" ")
+        user_id = int(meta[0])
+        chat_id = int(meta[1])
+        # await bot.copy_message(chat_id, current_message.chat.id,  current_message.message_id)
+        if current_message.text:
+            await bot.send_message(chat_id, f"""
+`{current_message.message_id}`
+{current_message.text}
+            """)
+        else:
+            await bot.copy_message(chat_id, current_message.chat.id,  current_message.message_id, caption=f"""
+`{current_message.message_id}` 
+{current_message.caption}
+            """)
+
+    except Exception as e:
+        print(e)
+
+
+@bot.message_handler(func=lambda msg: msg and msg.reply_to_message and msg.chat and msg.from_user and msg.from_user.id == msg.chat.id,
+                     content_types=['audio', 'photo', 'voice', 'video', 'document',
+                                    'text', 'location', 'contact', 'sticker'])
+async def reply_to_us(current_message: Message):
+    message = current_message.reply_to_message
+    print(current_message)
+    # print("DDDDDDDDDDDDD",message)
+    try:
+        meta = message.text.split("\n")[0].split(" ")
+        message_id = int(meta[0])
+        # await bot.copy_message(chat_id, current_message.chat.id,  current_message.message_id)
+        if current_message.text:
+            await bot.send_message(-1001884387011, f"""
+`{current_message.from_user.id}` `{current_message.chat.id}` 
+[{message.from_user.first_name or ""} {message.from_user.last_name or ""}](tg://user?id={message.from_user.id})            
+{current_message.text}
+            """, reply_to_message_id=message_id)
+        else:
+            await bot.copy_message(-1001884387011, current_message.chat.id,  current_message.message_id, caption=f"""
+`{current_message.from_user.id}` `{current_message.chat.id}`
+[{message.from_user.first_name or ""} {message.from_user.last_name or ""}](tg://user?id={message.from_user.id})
+{current_message.caption}
+            """, reply_to_message_id=message_id)
+
+    except Exception as e:
+        print(e)
+
+
+@bot.message_handler(func=lambda msg: msg and msg.chat and msg.from_user and msg.from_user.id == msg.chat.id)
 # @bot.message_handler(func=lambda msg:msg and msg.sender_chat and msg.sender_chat.id==msg.from_user.id)
 async def send_welcome(message):
     # await bot.send_message(message.chat.id,'d',reply_markup=ReplyKeyboardRemove())
