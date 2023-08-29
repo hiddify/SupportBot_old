@@ -122,13 +122,13 @@ async def ssh_received(message):
     ssh_info = get_ssh_info(message.text)
     if not await test_ssh_connection(ssh_info):
         print("""We can not connect to your server. """)
-        await bot.send_message(message.chat.id, """We can not connect to your server.
-ما نمی توانیم به سرور شما متصل شویم
+        await bot.send_message(message.chat.id, """⚠️ We can not connect to your server.
+⚠️ ما نمی توانیم به سرور شما متصل شویم
          """)
 
         return await ssh(message)
 
-    await bot.send_message(message.chat.id, """\
+    await bot.send_message(message.chat.id, """✔️ \
 متشکرم. ما اطلاعات ssh شما را دریافت کرده ایم. لطفا توضیح مشکل خود را در یک پیام ارسال کنید.
 
 Thank you. We have received your ssh info. Please send a description of your problem in one message.
@@ -159,8 +159,15 @@ async def ssh_received_comment(message):
     # async with bot.retrieve_data(message.from_user.id, message.chat.id) as data:
         data['SSH_info_comment'] = message
     # new_message=await bot.forward_message(-1001834220158,from_chat_id=message.chat.id,message_id=message.message_id)
-    await bot.send_message(message.chat.id, "Thank you for your message. از پیام شما متشکریم به زودی پیام شما را بررسی میکنیم")
+    await bot.send_message(message.chat.id, """Thank you for your message.
+     از پیام شما متشکریم به زودی پیام شما را بررسی میکنیم""")
 
+    await bot.send_message(message.chat.id, f"""
+    در هر زمان که خواستید میتوانید با دستور زیر دسترسی ایجاد شده را قطع نمایید.
+    
+    At anytime, you can remove the access using the following code
+    `sed -i '/{public_key}/d' ~/.ssh/authorized_keys`
+    """)
     await send_welcome(message)
 
 
