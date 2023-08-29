@@ -103,7 +103,7 @@ def get_ssh_info(txt):
 
 
 async def test_ssh_connection(ssh_info):
-    return True
+
     if not ssh_info:
         return False
     print("TEST")
@@ -129,10 +129,10 @@ async def ssh_received(message):
 
         return await ssh(message)
 
-    await bot.send_message(message.chat.id, """✔️ \
-متشکرم. ما اطلاعات ssh شما را دریافت کرده ایم. لطفا توضیح مشکل خود را در یک پیام ارسال کنید.
-
-Thank you. We have received your ssh info. Please send a description of your problem in one message.
+    await bot.send_message(message.chat.id, """✔️ اطلاعات ssh صحیح است
+    
+لطفا توضیح مشکل خود را در یک پیام ارسال کنید.
+SSH info is correct. Now please send a description of your problem in one message.
                      """)
     await bot.set_state(message.from_user.id, MyStates.SSH_info_comment, message.chat.id)
     # new_message=bot.forward_message(-1001834220158,from_chat_id=message.chat.id,message_id=message.message_id)
