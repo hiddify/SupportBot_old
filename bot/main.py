@@ -111,12 +111,12 @@ def get_ssh_info(txt):
 async def test_ssh_connection(ssh_info):
 
     if not ssh_info:
-        
+
         return False
     print("TEST")
     try:
         async with asyncssh.connect(ssh_info['host'], port=ssh_info['port'], username=ssh_info['user'], client_keys=[private_key_path], known_hosts=None, connect_timeout=1) as conn:
-            result = await conn.run("pip3 freeze | grep hiddifypanel | awk -F"==" '{ print $2 }'")
+            result = await conn.run("pip3 freeze | grep hiddifypanel | awk -F" == " '{ print $2 }'")
             print(result.stdout)
             print("SUCCESS")
             return result.stdout
@@ -128,7 +128,7 @@ async def test_ssh_connection(ssh_info):
 @bot.message_handler(state=MyStates.SSH_info)
 async def ssh_received(message):
     ssh_info = get_ssh_info(message.text)
-    panel_version=await test_ssh_connection(ssh_info)
+    panel_version = await test_ssh_connection(ssh_info)
     if not panel_version:
         print("""We can not connect to your server. """)
         await bot.send_message(message.chat.id, """
@@ -140,7 +140,7 @@ async def ssh_received(message):
         await asyncio.sleep(1)
         return await ssh(message)
 
-    await bot.send_message(message.chat.id, """✔️ اطلاعات ssh صحیح است
+    await bot.send_message(message.chat.id, f"""✔️ اطلاعات ssh صحیح است
     {panel_version}
 
 لطفا توضیح مشکل خود را در یک پیام ارسال کنید.
@@ -152,7 +152,7 @@ SSH info is correct. Now please send a description of your problem in one messag
 
     async with bot.retrieve_data(message.from_user.id, message.chat.id) as data:
         data['SSH_info'] = ssh_info
-        data['panel_version']=panel_version
+        data['panel_version'] = panel_version
     #     bot.reply_to(new_message,data['SSH_info'])
 
 
@@ -160,7 +160,7 @@ SSH info is correct. Now please send a description of your problem in one messag
 async def ssh_received_comment(message):
     async with bot.retrieve_data(message.from_user.id, message.chat.id) as data:
         ssh_info = data['SSH_info']
-        panel_version=data['panel_version']
+        panel_version = data['panel_version']
         msgtxt = f'''
     `{message.from_user.id}` `{message.chat.id}` `DN={'support_message' in data}`
     [{message.from_user.first_name or ""} {message.from_user.last_name or ""}](tg://user?id={message.from_user.id}) [user:](@{message.from_user.username})  in {message.chat.title}
