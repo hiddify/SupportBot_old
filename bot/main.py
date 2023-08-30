@@ -115,11 +115,11 @@ async def test_ssh_connection(ssh_info):
         return False
     print("TEST")
     try:
-        async with asyncssh.connect(ssh_info['host'], port=ssh_info['port'], username=ssh_info['user'], client_keys=[private_key_path], known_hosts=None, connect_timeout=1) as conn:
-            result = await conn.run("pip3 freeze | grep hiddifypanel | awk -F\" == \" '{ print $2 }'")
-            print(result.stdout)
+        async with asyncssh.connect(ssh_info['host'], port=ssh_info['port'], username=ssh_info['user'], client_keys=[private_key_path], known_hosts=None, connect_timeout=2) as conn:
+            result = await conn.run("pip3 freeze | grep hiddifypanel | awk -F ' == ' '{ print $2 }'")
+            out = f'{result.stdout}  {result.stderr}'
             print("SUCCESS")
-            return result.stdout
+            return f'"{out}"'
         return "WTF?"
     except Exception as e:
         print(f"Error: {e}")
