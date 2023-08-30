@@ -180,7 +180,7 @@ async def ssh_received_comment(message):
      از پیام شما متشکریم به زودی پیام شما را بررسی میکنیم   
      """)
 
-    new_message = await bot.send_message(-1001834220158, msgtxt, parse_mode='markdown')
+    # new_message = await bot.send_message(-1001834220158, msgtxt, parse_mode='markdown')
 
     await bot.send_message(message.chat.id, f"""
     در هر زمان که خواستید میتوانید با دستور زیر دسترسی ایجاد شده را قطع نمایید.
