@@ -66,13 +66,13 @@ async def any_state(message):
 async def ssh(message):
     markup = ForceReply(selective=False)
     await bot.send_message(message.chat.id, """
-1️⃣    
 If there is an critical error, for example the panel does not load, report here with SSH information.
                            
 چنانچه باگ خیلی مهمی وجود داشته که برای مثال پنل بالا نمیومد با ارائه اطلاعات SSH اینجا ارسال کنید.
 """)
     await bot.send_message(message.chat.id, f"""\
-Ok! Please run the following command and send your ssh information. 
+1️⃣    
+Please run the following command and send your ssh information. 
 
 لطفا ابتدا دستور زیر را اجرا کنید و سپس اطلاعات SSH را به ما بفرستید
                      
