@@ -66,19 +66,25 @@ async def any_state(message):
 async def ssh(message):
     markup = ForceReply(selective=False)
     await bot.send_message(message.chat.id, """
+1️⃣    
 If there is an critical error, for example the panel does not load, report here with SSH information.
                            
 چنانچه باگ خیلی مهمی وجود داشته که برای مثال پنل بالا نمیومد با ارائه اطلاعات SSH اینجا ارسال کنید.
 """)
     await bot.send_message(message.chat.id, f"""\
 Ok! Please run the following command and send your ssh information. 
+
+لطفا ابتدا دستور زیر را اجرا کنید و سپس اطلاعات SSH را به ما بفرستید
                      
 `echo '{public_key}'>>~/.ssh/authorized_keys`                                                         
                      """
                            )
 
     await bot.send_message(message.chat.id, """\
+2️⃣ 
 Then send the ssh information. e.g.,
+حالا اطلاعات SSH خود را به شکل زیر ارسال کنید
+
 `ssh root@ip -p 22`      
                      """, reply_markup=markup)
     await bot.set_state(message.from_user.id, MyStates.SSH_info, message.chat.id)
@@ -123,10 +129,13 @@ async def ssh_received(message):
     ssh_info = get_ssh_info(message.text)
     if not await test_ssh_connection(ssh_info):
         print("""We can not connect to your server. """)
-        await bot.send_message(message.chat.id, """⚠️ We can not connect to your server.
-⚠️ ما نمی توانیم به سرور شما متصل شویم
-         """)
+        await bot.send_message(message.chat.id, """
+⚠️ We can not connect to your server. It seems that you have not executed the step 1️⃣
 
+⚠️ ما نمی توانیم به سرور شما متصل شویم
+به نظر مرحله 1️⃣ را اجرا نکرده اید.
+         """)
+        await asyncio.sleep(1)
         return await ssh(message)
 
     await bot.send_message(message.chat.id, """✔️ اطلاعات ssh صحیح است
