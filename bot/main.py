@@ -49,6 +49,7 @@ class MyStates(StatesGroup):
     Feedback = State()
     Support = State()
     INIT = State()
+    CONTRIBUTE=State()
 
 
 # Any state
@@ -351,6 +352,46 @@ Welcome to Hiddify. Please select what do you want to send?
 به هیدیفای خوش آمدید. لطفا مشخص کنید چه چیزی میخواهید ارسال کنید.
 """, reply_markup=markup)
     await bot.set_state(message.from_user.id, MyStates.INIT, message.chat.id)
+
+
+
+@bot.message_handler(state=MyStates.CONTRIBUTE)
+async def contribute_comment(message):
+    
+    msgtxt = f'''
+    `{message.from_user.id}` `{message.chat.id}` 
+    [{message.from_user.first_name or ""} {message.from_user.last_name or ""}](tg://user?id={message.from_user.id}) [user:](@{message.from_user.username})  in {message.chat.title}
+
+    {message.text}
+    '''
+        # print(msgtxt)
+    new_message = await bot.send_message(-1001834220158, msgtxt, parse_mode='markdown')
+
+    # new_message=await bot.forward_message(-1001834220158,from_chat_id=message.chat.id,message_id=message.message_id)
+    await bot.send_message(message.chat.id, """
+    Thank you for your message.
+     از پیام شما متشکریم به زودی پیام شما را بررسی میکنیم   
+     """)
+
+    # new_message = await bot.send_message(-1001834220158, msgtxt, parse_mode='markdown')
+
+
+@bot.message_handler(commands=['start'], func=lambda message: "contribute" in message.text)
+# @bot.message_handler(func=lambda msg:msg and msg.sender_chat and msg.sender_chat.id==msg.from_user.id)
+async def send_contribute(message):
+    # await bot.send_message(message.chat.id,'d',reply_markup=ReplyKeyboardRemove())
+    # return
+    print('state', MyStates.SSH_info, message)
+    print(message.from_user.id, message.chat.id, type(message.from_user.id), type(message.chat.id))
+    markup = ForceReply(selective=False)
+    await bot.reply_to(message, """\
+Thank you for expressing your interest in contributing to the Hiddify Project. We kindly request that you share your capabilities and your availability for continuing the conversion. \n
+We look forward to your response.
+
+با سپاس از تمایل شما به مشارکت در پروژه هیدیفای. خواهشمندیم توانایی‌ها و زمان خالی خود برای ادامه صحبت یا ما به اشتراک بگذارید. 
+منتظر پاسخ شما هستیم.
+""", reply_markup=markup)
+    await bot.set_state(message.from_user.id, MyStates.CONTRIBUTE, message.chat.id)    
 
 bot.add_custom_filter(asyncio_filters.StateFilter(bot))
 
