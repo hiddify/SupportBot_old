@@ -64,7 +64,7 @@ async def any_state(message):
 
 
 
-@bot.message_handler(state=MyStates.CONTRIBUTE)
+@bot.message_handler(state=MyStates.CONTRIBUTE, func=lambda message: "/start contribute" not in message.text)
 async def contribute_comment(message):
     
     msgtxt = f'''
