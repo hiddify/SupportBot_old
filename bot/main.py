@@ -209,7 +209,7 @@ async def ssh_received_comment(message):
     [{message.from_user.first_name or ""} {message.from_user.last_name or ""}](tg://user?id={message.from_user.id}) [user:](@{message.from_user.username})  in {message.chat.title}
     {panel_version}
     `ssh {ssh_info['user']}@{ssh_info['host']} -p {ssh_info['port']}`
-    [SSH](https://{SSH_HOST}/?host={ssh_info['host']}&port={ssh_info['port']}&user={ssh_info['user']}&password=support)6
+    [SSH Site](https://{SSH_HOST}/?host={ssh_info['host']}&port={ssh_info['port']}&user={ssh_info['user']}&password=support)
 
     {message.text}
     '''
