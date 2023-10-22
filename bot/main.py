@@ -93,14 +93,14 @@ async def send_contribute(message):
     # return
     print('state', MyStates.SSH_info, message)
     print(message.from_user.id, message.chat.id, type(message.from_user.id), type(message.chat.id))
-    markup = ForceReply(selective=False)
+    # markup = ForceReply(selective=False)
     await bot.reply_to(message, """\
 Thank you for expressing your interest in contributing to the Hiddify Project. We kindly request that you share your capabilities and your availability for continuing the conversion. \n
 We look forward to your response.
 
 با سپاس از تمایل شما به مشارکت در پروژه هیدیفای. خواهشمندیم توانایی‌ها و زمان خالی خود برای ادامه صحبت یا ما به اشتراک بگذارید. 
 منتظر پاسخ شما هستیم.
-""", reply_markup=markup)
+""", reply_markup=None)
     await bot.set_state(message.from_user.id, MyStates.CONTRIBUTE, message.chat.id)    
 
 
