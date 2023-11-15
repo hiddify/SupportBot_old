@@ -147,6 +147,7 @@ async def send_contribute(message):
 مطالعه کردم و قبول دارم.
 
 💸💸💸💸💸💸💸💸
+Hiddify Manager is an always free software. But if you need dedicated support, considering that our experts have to dedicate their time and energy to you, you need to pay at least 10$ per half hour.
 
 ✅By donating 10$ per 30 minutes to our project and send the receipt to the bot below, the installation of Hiddify Manager (Hiddify Panel) will be started by our authorized experts. 
 
