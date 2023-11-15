@@ -50,6 +50,7 @@ class MyStates(StatesGroup):
     Support = State()
     INIT = State()
     CONTRIBUTE=State()
+    INSTALL=State()
 
 
 # Any state
@@ -102,6 +103,56 @@ We look forward to your response.
 منتظر پاسخ شما هستیم.
 """, reply_markup=None)
     await bot.set_state(message.from_user.id, MyStates.CONTRIBUTE, message.chat.id)    
+
+
+
+
+@bot.message_handler(state=MyStates.INSTALL, func=lambda message: "/start" not in message.text)
+async def contribute_comment(message):
+    
+    msgtxt = f'''
+    `{message.from_user.id}` `{message.chat.id}` 
+    [{message.from_user.first_name or ""} {message.from_user.last_name or ""}](tg://user?id={message.from_user.id}) [user:](@{message.from_user.username})  in {message.chat.title}
+
+    {message.text}
+    '''
+        # print(msgtxt)
+    new_message = await bot.send_message(-1001834220158, msgtxt, parse_mode='markdown')
+
+    # new_message=await bot.forward_message(-1001834220158,from_chat_id=message.chat.id,message_id=message.message_id)
+    await bot.send_message(message.chat.id, """
+    Thank you for your message.
+     از پیام شما متشکریم به زودی پیام شما را بررسی میکنیم   
+     """)
+    await bot.set_state(message.from_user.id, MyStates.start, message.chat.id)    
+
+    # new_message = await bot.send_message(-1001834220158, msgtxt, parse_mode='markdown')
+
+
+@bot.message_handler(commands=['start'], func=lambda message: "install" in message.text)
+# @bot.message_handler(func=lambda msg:msg and msg.sender_chat and msg.sender_chat.id==msg.from_user.id)
+async def send_contribute(message):
+    # await bot.send_message(message.chat.id,'d',reply_markup=ReplyKeyboardRemove())
+    # return
+    print('state', MyStates.SSH_info, message)
+    print(message.from_user.id, message.chat.id, type(message.from_user.id), type(message.chat.id))
+    # markup = ForceReply(selective=False)
+    await bot.reply_to(message, """\
+✅ بدین صورت با دونیت ۱۰ دلار برای هر نیم ساعت به پروژه و ارسال رسید انتقال، عملیات نصب و پیکربندی هیدیفای‌منیجر (پنل هیدیفای) بر روی سرور شما توسط کارشناسان هیدیفای انجام می‌شود. 
+
+❗ضمنا قبل از شروع به نصب بایستی یک سرور 💻اوبونتو ۲۲.۰۴ تهیه کنید و حداقل یک دامنه تهیه کنید.
+
+مطالعه کردم و قبول دارم.
+
+💸💸💸💸💸💸💸💸
+
+✅By donating 10$ per 30 minutes to our project and send the receipt to the bot below, the installation of Hiddify Manager (Hiddify Panel) will be started by our authorized experts. 
+
+❗Please consider this note that you need to buy an 💻Ubuntu server version 22.04 as well as 1 domains before we can start installation. 
+
+I read and agree.
+""", reply_markup=None)
+    await bot.set_state(message.from_user.id, MyStates.INSTALL, message.chat.id)    
 
 
 @bot.message_handler(func=lambda msg: msg.text == "Critical Bug")
