@@ -101,7 +101,7 @@ We look forward to your response.
 
 با سپاس از تمایل شما به مشارکت در پروژه هیدیفای. خواهشمندیم توانایی‌ها و زمان خالی خود برای ادامه صحبت یا ما به اشتراک بگذارید. 
 منتظر پاسخ شما هستیم.
-""", reply_markup=None)
+""", reply_markup=None,)
     await bot.set_state(message.from_user.id, MyStates.CONTRIBUTE, message.chat.id)    
 
 
@@ -161,7 +161,7 @@ Please read the following carefully and if you agree, go to the next step.
 
 در صورت موافقت با موارد فوق درخواست خود را با جزییات در یک پیام ارسال نمایید
 Please send the details about your request in a single text message.
-""", reply_markup=None)
+""", reply_markup=None, disable_web_page_preview=True)
     await bot.set_state(message.from_user.id, MyStates.INSTALL, message.chat.id)    
 
 
