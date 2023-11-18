@@ -137,23 +137,30 @@ async def send_contribute(message):
     print('state', MyStates.SSH_info, message)
     print(message.from_user.id, message.chat.id, type(message.from_user.id), type(message.chat.id))
     # markup = ForceReply(selective=False)
-    await bot.reply_to(message, """\
-    هیدیفای رایگان است  و همیشه رایگان خواهد ماند. اما چنانچه نیاز به ساپورت اختصاصی دارید با توجه به اینکه کارشناسان ما باید وقت و انرژیشون را به شما اختصاص بدهند لازمه به ازای هر نیم ساعت مبلغ حداقل ۱۰ دلار حمایت کنید.
+    await bot.reply_to(message, """\هیدیفای رایگان است و همیشه رایگان خواهد ماند. تمامی آموزش‌های مربوط به نصب و پیکربندی هیدیفای هم در ویکی [گیتهاب](https://github.com/hiddify/Hiddify-Manager/wiki/%D9%87%D9%85%D9%87-%D8%A2%D9%85%D9%88%D8%B2%D8%B4%E2%80%8C%D9%87%D8%A7-%D9%88-%D9%88%DB%8C%D8%AF%D8%A6%D9%88%D9%87%D8%A7) و  [کانال یوتیوب هیدیفای](https://www.youtube.com/@hiddify) قرار داده شده‌اند. اما چنانچه نیاز دارید کارشناسان ما مراحل نصب و پیکربندی را به صورت اختصاصی برای شما انجام دهند، لازم است به ازای هر نیم ساعت با مبلغ ۱۰ دلار از پروژه هیدیفای حمایت کنید. پس از ارسال رسید انتقال، عملیات نصب و پیکربندی هیدیفای منیجر (پنل هیدیفای) بر روی سرور شما انجام می‌شود. 
 
-✅ بدین صورت با دونیت ۱۰ دلار برای هر نیم ساعت به پروژه و ارسال رسید انتقال، عملیات نصب و پیکربندی هیدیفای‌منیجر (پنل هیدیفای) بر روی سرور شما توسط کارشناسان هیدیفای انجام می‌شود. 
+لطفا موارد زیر را به دقت مطالعه کنید و در صورت موافقت به مرحله بعد بروید.
 
-❗ضمنا قبل از شروع به نصب بایستی یک سرور 💻اوبونتو ۲۲.۰۴ تهیه کنید و حداقل یک دامنه تهیه کنید.
+ ۱. قبل از شروع به نصب می‌بایست یک سرور اوبونتو ۲۲.۰۴ و حداقل یک دامنه تهیه کنید.
+۱. کارشناسان هیدیفای رایج‌ترین و موثرترین راهکار را بر روی پنل شما پیاده‌سازی می‌کنند. در صورتی که درخواست ویژه‌ای در مراحل نصب دارید، لطفا پیش از شروع اعلام کنید.
+ ۲. استفاده از تانل و سرویس‌ها ایرانی و دامنه‌های .ir و رایگان احتمال فیلتر شدن سرور را افزایش می‌دهند. با این حال، درصورت درخواست شما این کار انجام می‌شود.
+۳. مراحل نصب و پیکربندی طبق استاندارد و با تکیه بر تجربه کارشناسان هیدیفای انجام می‌شود. با این حال در صورت فیلتر و محدود شدن سرور هیچ مسئولیتی به عهده تیم هیدیفای نیست. 
+۴. نصب و پیکربندی در زمان حداکثر نیم ساعت توسط کارشناسان تیم هیدیفای انجام می‌شود. اگر مراحل نصب و پیکربندی بیش از نیم ساعت زمان نیاز داشته باشد و یا در صورت فیلتر یا محدود شدن سرور و نیاز به عیب‌یابی اختصاصی از سمت کارشناسان هیدیفای، لازم است به ازای هر نیم ساعت پشتیبانی اختصاصی مبلغ ۱۰ دلار از پروژه حمایت کنید.
 
-مطالعه کردم و قبول دارم.
+Hiddify is free and will always be free. All the instructions related to the installation and configuration of Hiddify are placed on the [GitHub wiki](https://github.com/hiddify/Hiddify-Manager/wiki/All-tutorials-and-videos)and YouTube channel of [Hiddify](https://www.youtube.com/@hiddify). But if you need our experts to carry out the installation and configuration steps exclusively for you, you need to support the Hiddify project with an amount of $10 per half hour. After sending the transfer receipt, installation and configuration of Hiddify Manager (Hiddify panel) will be done on your server.
 
-💸💸💸💸💸💸💸💸
-Hiddify Manager is an always free software. But if you need dedicated support, considering that our experts have to dedicate their time and energy to you, you need to pay at least 10$ per half hour.
+Please read the following carefully and if you agree, go to the next step.
 
-✅By donating 10$ per 30 minutes to our project and send the receipt to the bot below, the installation of Hiddify Manager (Hiddify Panel) will be started by our authorized experts. 
+1. Before starting the installation, you need to prepare an Ubuntu 22.04 server and at least one domain.
+2. Hiddify experts implement the most common and effective solution on your panel. If you have a special request during the installation process, please let us know before starting.
+3. The use of Iranian tunnels and services and .ir and free domains increase the possibility of the server being filtered. However, this will be done upon your request.
+4. The installation and configuration steps are carried out according to the standard and relying on the experience of Hiddify experts. However, if the server is filtered and restricted, the Hiddify team is not responsible.
+5. The installation and configuration is done by Hiddify team experts in a maximum of half an hour. If the installation and configuration process takes more than half an hour, or if the server is filtered or limited and special troubleshooting is required by Hiddify experts, it is necessary to support the project with an amount of $10 per half hour of dedicated support.
 
-❗Please consider this note that you need to buy an 💻Ubuntu server version 22.04 as well as 1 domains before we can start installation. 
 
-I read and agree.
+
+در صورت موافقت با موارد فوق درخواست خود را با جزییات در یک پیام ارسال نمایید
+Please send the details about your request in a single text message.
 """, reply_markup=None)
     await bot.set_state(message.from_user.id, MyStates.INSTALL, message.chat.id)    
 
