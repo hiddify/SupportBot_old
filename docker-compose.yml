@@ -2,8 +2,22 @@ version: '3'
 
 services:
   supportbot:
-    build: .
+    restart: unless-stopped
+    build:
+      context: .
     volumes:
       - ./bot:/root/hiddifysupport
     environment:
-      BOT_TOKEN: token
+      - DB_HOST=${DB_HOST}
+      - DB_NAME=${DB_NAME}
+      - DB_PORT=${DB_PORT}
+      - DB_USER=${DB_USER}
+      - DB_PASS=${DB_PASS}
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - SSH_HOST=${SSH_HOST}
+    networks:
+      - shared_network
+
+networks:
+  shared_network:
+    external: true
