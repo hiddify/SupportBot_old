@@ -6,13 +6,13 @@ services:
     build:
       context: .
     volumes:
-      - ./bot:/root/hiddifysupport
+      - .:/root/hiddifysupport
     environment:
-      - DB_HOST=${DB_HOST}
-      - DB_NAME=${DB_NAME}
-      - DB_PORT=${DB_PORT}
-      - DB_USER=${DB_USER}
-      - DB_PASS=${DB_PASS}
+      # - DB_HOST=${DB_HOST}
+      # - DB_NAME=${DB_NAME}
+      # - DB_PORT=${DB_PORT}
+      # - DB_USER=${DB_USER}
+      # - DB_PASSWORD=${DB_PASSWORD}
       - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
       - SSH_HOST=${SSH_HOST}
     networks:
