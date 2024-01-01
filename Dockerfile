@@ -67,9 +67,10 @@ RUN pip3 install --upgrade pip setuptools wheel
 WORKDIR /root/hiddifysupport
 
 #Copy config file to /root/SaitamaRobot/SaitamaRobot
-COPY ./bot/ /root/hiddifysupport/
+COPY . /root/hiddifysupport
+COPY assets /root/hiddifysupport/assets
 
-ENV PATH="/home/bot/bin:$PATH"
+# ENV PATH="/home/bot/bin:$PATH"
 
 # Install requirements
 RUN pip3 install --no-cache-dir -U -r requirement.txt
