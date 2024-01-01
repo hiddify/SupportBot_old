@@ -3,6 +3,7 @@
 import mysql.connector
 import datetime, os
 from log import log
+from dotenv import load_dotenv
 
 # Load environment variables from .env file
 load_dotenv()
