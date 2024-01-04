@@ -1,4 +1,10 @@
+assets/hiddify_support.key
+assets/hiddify_support.key.pub
+venv/
+**/__pycache__/
+__pycache__/
 .env
 test.py
 *.key
 *.key.pub
+*.log

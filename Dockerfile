@@ -20,7 +20,6 @@ RUN apt update && apt upgrade -y && \
     libjpeg-dev \
     libjpeg62-turbo-dev \
     libwebp-dev \
- #   linux-headers-amd64 \
     musl-dev \
     musl \
     neofetch \
@@ -62,18 +61,19 @@ RUN apt update && apt upgrade -y && \
     && rm -rf /var/lib/apt/lists /var/cache/apt/archives /tmp
 
 # Pypi package Repo upgrade
-RUN pip3 install --upgrade pip setuptools
+RUN pip3 install --upgrade pip setuptools wheel
 
 # Copy Python Requirements to /root/SaitamaRobot
 WORKDIR /root/hiddifysupport
 
 #Copy config file to /root/SaitamaRobot/SaitamaRobot
-COPY ./bot/ /root/hiddifysupport/
+COPY . /root/hiddifysupport
+COPY assets /root/hiddifysupport/assets
 
-ENV PATH="/home/bot/bin:$PATH"
+# ENV PATH="/home/bot/bin:$PATH"
 
 # Install requirements
-RUN pip3 install -U -r requirement.txt
+RUN pip3 install --no-cache-dir -U -r requirement.txt
 
 # Starting Worker
-CMD ["python3","main.py"]
+CMD ["python3", "main.py"]
