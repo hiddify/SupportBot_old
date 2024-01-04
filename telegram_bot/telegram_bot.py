@@ -1,10 +1,10 @@
 # telegram_bot/telegram_bot
 
 import os
+import logging
 from log import log
-from database import database
-from prettytable import PrettyTable
-import asyncssh
+import paramiko
+import asyncio
 import telebot
 from telebot.async_telebot import AsyncTeleBot
 from telebot import asyncio_filters
@@ -13,17 +13,19 @@ from telebot.types import ReplyKeyboardMarkup, KeyboardButton, ForceReply, Reply
 from telebot.asyncio_storage import StateMemoryStorage
 from messages.common_messages import CommonMessages
 
+# Enable logging
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
+telebot.logger.setLevel(logging.INFO)  # Outputs debug messages to console.
+logger = telebot.logger
+
 # Set env variables
 SSH_HOST = os.environ.get('SSH_HOST')
 TELEGRAM_BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN')
 
-# Init database
-database.init()
-
 # Init storage
 state_storage = StateMemoryStorage()
-private_key_path = "../assets/hiddify_support.key"
-with open("../assets/hiddify_support.key.pub", 'r') as file:
+private_key_path = "/root/hiddifysupport/assets/hiddify_support.key"
+with open("/root/hiddifysupport/assets/hiddify_support.key.pub", 'r') as file:
     public_key = file.read()
 
 # Exception handler
@@ -148,15 +150,31 @@ async def test_ssh_connection(ssh_info):
 
     print("Test starting...")
     try:
-        async with asyncssh.connect(ssh_info['host'], port=ssh_info['port'], username=ssh_info['user'], client_keys=[private_key_path], known_hosts=None, connect_timeout=2) as conn:
-            result = await conn.run("pip3 freeze | grep hiddifypanel | awk -F ' == ' '{ print $2 }'")
-            out = f'{result.stdout}  {result.stderr}'
-            print("Test was successful!")
-            return f'"{out}"'
-        return "WTF?"
+        # Creating a Paramiko SSH client
+        ssh_client = paramiko.SSHClient()
+        ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+
+        # Connecting to the SSH server
+        ssh_client.connect(hostname=ssh_info['host'],
+                           port=ssh_info['port'],
+                           username=ssh_info['user'],
+                           key_filename=private_key_path,
+                           timeout=2)
+
+        # Running the command
+        stdin, stdout, stderr = ssh_client.exec_command("pip3 freeze | grep hiddifypanel | awk -F ' == ' '{ print $2 }'")
+        result = stdout.read().decode() + stderr.read().decode()
+
+        print("Test was successful!")
+        return f'"{result}"'
+
     except Exception as e:
         print(f"Error: {e}")
-    return False
+        return False
+
+    finally:
+        # Closing the SSH connection
+        ssh_client.close()
 
 @bot.message_handler(state=MyStates.SSH_info)
 async def ssh_received(message):

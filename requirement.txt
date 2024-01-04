@@ -1,6 +1,10 @@
-pyTelegramBotAPI
-load_dotenv
-asyncio
-aiohttp
-pep505
-asyncssh
+mysql-connector-python==8.0.27
+telebot==0.0.4
+textwrap3==0.9.2
+python-dotenv==0.19.1
+pyTelegramBotAPI==4.14.1
+asyncio==3.4.3
+aiohttp==3.9.1
+pep505==0.9.3
+asyncio==3.4.3
+paramiko==3.4.0
